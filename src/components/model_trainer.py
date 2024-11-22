@@ -107,17 +107,26 @@ class ModelTrainer:
         try:
             logging.info(f"Splitting training and testing input and target features")
 
-            x_train, y_train, x_test, y_test = (
-                train_array[:, :-1],
-                train_array[:, -1],
-                test_array[:, :-1],
-                test_array[:, -1],
-            )
+            # Assuming 'Risk' is the target column, and it's in both train and test datasets
+            target_column = 'Risk'
+            
+            # For train array, check if the last column is the target variable
+            if target_column in train_array.columns:
+                x_train = train_array.drop(columns=[target_column])  # Features (input)
+                y_train = train_array[target_column]  # Target variable (Risk)
+            else:
+                raise Exception(f"Target column '{target_column}' not found in the training data.")
 
-            # Extracting model config file path
-            logging.info(f"Extracting model config file path")
+            # For test array, similarly ensure that 'Risk' exists in the columns
+            if target_column in test_array.columns:
+                x_test = test_array.drop(columns=[target_column])  # Features (input)
+                y_test = test_array[target_column]  # Target variable (Risk)
+            else:
+                raise Exception(f"Target column '{target_column}' not found in the test data.")
 
-            # Evaluate models
+            logging.info(f"Data split completed. Proceeding with model evaluation and training.")
+
+            # Now continue with the model training process as usual
             model_report: dict = self.evaluate_models(X=x_train, y=y_train, models=self.models)
 
             # To get the best model score from dict
