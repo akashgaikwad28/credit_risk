@@ -103,21 +103,38 @@ class ModelTrainer:
         except Exception as e:
             raise CustomException(e, sys)
 
+    
+
     def initiate_model_trainer(self, train_array, test_array):
         try:
             logging.info(f"Splitting training and testing input and target features")
 
-            # Assuming 'Risk' is the target column, and it's in both train and test datasets
+           
             target_column = 'Risk'
-            
-            # For train array, check if the last column is the target variable
+
+            # Check if train_array and test_array are numpy arrays or pandas DataFrames
+            if isinstance(train_array, np.ndarray):
+            # If the train array is numpy, convert it to a DataFrame with the feature names
+                logging.info("Converting train_array to pandas DataFrame")
+                train_array = pd.DataFrame(train_array, columns=['Age','Sex','Job','Housing','Saving accounts','Checking account','Credit amount','Duration','Purpose','Risk'])
+
+            if isinstance(test_array, np.ndarray):
+                # If the test array is numpy, convert it to a DataFrame with the feature names
+                logging.info("Converting test_array to pandas DataFrame")
+                test_array = pd.DataFrame(test_array, columns=['Age','Sex','Job','Housing','Saving accounts','Checking account','Credit amount','Duration','Purpose','Risk'])
+
+            # Log the column names to help with debugging
+                logging.info(f"Train Array Columns: {train_array.columns}")
+                logging.info(f"Test Array Columns: {test_array.columns}")
+
+            # For train array, check if the target column exists
             if target_column in train_array.columns:
                 x_train = train_array.drop(columns=[target_column])  # Features (input)
                 y_train = train_array[target_column]  # Target variable (Risk)
             else:
                 raise Exception(f"Target column '{target_column}' not found in the training data.")
 
-            # For test array, similarly ensure that 'Risk' exists in the columns
+            # For test array, similarly check if 'Risk' exists in the columns
             if target_column in test_array.columns:
                 x_test = test_array.drop(columns=[target_column])  # Features (input)
                 y_test = test_array[target_column]  # Target variable (Risk)
