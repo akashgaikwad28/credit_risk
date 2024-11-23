@@ -32,7 +32,6 @@ class DataTransformationConfig:
         self.transformed_test_file_path = os.path.join(artifact_dir, 'test.npy')
         self.transformed_object_file_path = os.path.join(artifact_dir, 'preprocessor.pkl')
 
-
 class DataTransformation:
     def __init__(self, feature_store_file_path, artifact_folder):
         self.feature_store_file_path = feature_store_file_path
@@ -49,8 +48,6 @@ class DataTransformation:
             if TARGET_COLUMN not in data.columns:
                 raise CustomException(f"Target column '{TARGET_COLUMN}' not found in the dataset", sys)
 
-            # Rename the target column if needed
-            ## data.rename(columns={"Risk": TARGET_COLUMN}, inplace=True)
             return data
 
         except FileNotFoundError:
@@ -81,14 +78,15 @@ class DataTransformation:
             dataframe = self.get_data(feature_store_file_path=self.feature_store_file_path)
 
             # Check for required columns
-            required_cols = ['Saving accounts', 'Checking account', 'Housing', 'Purpose', 'Age', 'Credit amount', 'Duration']
+            required_cols = ['Saving accounts','Risk', 'Checking account', 'Housing', 'Purpose', 'Age', 'Credit amount', 'Duration']
             for col in required_cols:
                 if col not in dataframe.columns:
                     raise CustomException(f"Missing required column: {col}", sys)
 
-            # Fill missing values for categorical columns with the mode (most frequent value)
+            # Handle missing values for categorical columns with the mode (most frequent value)
             dataframe['Saving accounts'].fillna(dataframe['Saving accounts'].mode()[0], inplace=True)
             dataframe['Checking account'].fillna(dataframe['Checking account'].mode()[0], inplace=True)
+            dataframe['Sex'].fillna(dataframe['Sex'].mode()[0], inplace=True)  # Handle missing values in 'Sex'
 
             # Label encoding for categorical columns
             label_encoding_cols = ['Sex', 'Housing', 'Saving accounts', 'Checking account', 'Purpose']
