@@ -1,131 +1,150 @@
-from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.impute import KNNImputer
-from sklearn.pipeline import Pipeline
-import numpy as np
-import pandas as pd
 import os
-from dotenv import load_dotenv
 import sys
-from src.exception import CustomException
-from src.logger import logging
-from src.utils.main_utils import MainUtils
+import pandas as pd
+import numpy as np
+from sklearn.impute import KNNImputer
+from sklearn.preprocessing import RobustScaler, LabelEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
 from dataclasses import dataclass
+import pickle
+import logging
 
-# Load environment variables from .env file
-load_dotenv()
-
-# Define target column globally
-TARGET_COLUMN = "Risk"
+# Set up logging
+log_file = "data_transformation.log"
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Print logs to console
+        logging.FileHandler(log_file)  # Write logs to file
+    ]
+)
+logger = logging.getLogger()
 
 @dataclass
 class DataTransformationConfig:
-    artifact_dir: str
-    transformed_train_file_path: str
-    transformed_test_file_path: str
-    transformed_object_file_path: str
+    def __init__(self, artifact_folder="artifacts"):
+        self.artifact_dir = artifact_folder
+        self.transformed_train_file_path = os.path.join(self.artifact_dir, 'train.npy')
+        self.transformed_test_file_path = os.path.join(self.artifact_dir, 'test.npy')
+        self.transformed_object_file_path = os.path.join(self.artifact_dir, 'preprocessor.pkl')
 
-    def __init__(self, artifact_dir):
-        self.artifact_dir = artifact_dir
-        self.transformed_train_file_path = os.path.join(artifact_dir, 'train.npy')
-        self.transformed_test_file_path = os.path.join(artifact_dir, 'test.npy')
-        self.transformed_object_file_path = os.path.join(artifact_dir, 'preprocessor.pkl')
 
 class DataTransformation:
-    def __init__(self, feature_store_file_path, artifact_folder):
+    def __init__(self, feature_store_file_path, artifact_folder=None):
+        """
+        Initializes the DataTransformation class.
+        :param feature_store_file_path: Path to the ingested feature store.
+        :param artifact_folder: Path to the folder where artifacts are stored (optional).
+        """
         self.feature_store_file_path = feature_store_file_path
-        self.data_transformation_config = DataTransformationConfig(artifact_folder)
-        self.utils = MainUtils()
+        self.artifact_folder = artifact_folder if artifact_folder else "artifacts"  # Default to 'artifacts'
+        self.data_transformation_config = DataTransformationConfig(self.artifact_folder)
 
-    @staticmethod
-    def get_data(feature_store_file_path: str) -> pd.DataFrame:
+    def get_data(self):
+        """Reads and preprocesses the data."""
         try:
-            # Load CSV data
-            data = pd.read_csv(feature_store_file_path)
+            logger.info("Loading dataset from: %s", self.feature_store_file_path)
+            # Load dataset
+            df = pd.read_csv(self.feature_store_file_path)
 
-            # Ensure target column exists
-            if TARGET_COLUMN not in data.columns:
-                raise CustomException(f"Target column '{TARGET_COLUMN}' not found in the dataset", sys)
+            logger.info("Dropping unnecessary columns (if any).")
+            # Drop unnecessary columns
+            if "Unnamed: 0" in df.columns:
+                df.drop(["Unnamed: 0"], axis=1, inplace=True)
 
-            return data
+            # Handle missing values if needed (before encoding)
+            logger.info("Handling missing values.")
+            df.fillna(method='ffill', inplace=True)  # Forward fill as an example
 
-        except FileNotFoundError:
-            raise CustomException(f"File not found: {feature_store_file_path}", sys)
-        except pd.errors.EmptyDataError:
-            raise CustomException(f"CSV file is empty or not formatted correctly: {feature_store_file_path}", sys)
+            # Encode specific categorical variables
+            logger.info("Encoding categorical variables.")
+            saving_accounts_mapping = {'little': 0, 'moderate': 1, 'rich': 2, 'quite rich': 3}
+            checking_account_mapping = {'little': 0, 'moderate': 1, 'rich': 2}
+            df['Saving accounts'] = df['Saving accounts'].map(saving_accounts_mapping)
+            df['Checking account'] = df['Checking account'].map(checking_account_mapping)
+
+            # Columns to apply Label Encoding
+            label_encoding_cols = ['Sex','Job', 'Housing', 'Saving accounts', 'Checking account', 'Purpose']
+            # Initialize Label Encoder
+            label_encoder = LabelEncoder()
+
+            # Apply Label Encoding to each column
+            for col in label_encoding_cols:
+                if df[col].isnull().sum() > 0:
+                    logger.warning("Column %s contains missing values. These will be handled before encoding.", col)
+                    df[col].fillna(df[col].mode()[0], inplace=True)  # Fill missing values with mode
+
+                logger.info(f"Encoding column {col}.")
+                df[col] = label_encoder.fit_transform(df[col])
+
+            logger.info("Returning preprocessed dataframe.")
+            return df
         except Exception as e:
-            raise CustomException(f"Error reading data from {feature_store_file_path}: {e}", sys)
+            logger.error("Error during data loading: %s", e)
+            raise
 
-    def get_data_transformer_object(self, numeric_cols):
+    def get_data_transformer_object(self):
+        """Creates and returns a data transformer pipeline."""
         try:
-            # Create a pipeline for missing value imputation and scaling
-            imputer_step = ('imputer', KNNImputer(n_neighbors=5))
-            scaler_step = ('scaler', StandardScaler())
-
-            # Return the combined pipeline
-            preprocessor = Pipeline(steps=[imputer_step, scaler_step])
-            return preprocessor
-
+            logger.info("Creating data transformation pipeline.")
+            # Define a pipeline with imputation and scaling
+            pipeline = Pipeline([ 
+                ('imputer', KNNImputer(n_neighbors=5)),
+                ('scaler', RobustScaler())
+            ])
+            return pipeline
         except Exception as e:
-            raise CustomException(f"Error creating data transformer object: {e}", sys)
+            logger.error("Error during pipeline creation: %s", e)
+            raise
 
     def initiate_data_transformation(self):
-        logging.info("Starting data transformation process.")
-
+        """Main function for data transformation."""
         try:
-            # Load the dataset from the feature store
-            dataframe = self.get_data(feature_store_file_path=self.feature_store_file_path)
+            logger.info("Starting data transformation process.")
+            
+            # Load and preprocess data
+            dataframe = self.get_data()
 
-            # Check for required columns
-            required_cols = ['Saving accounts','Risk', 'Checking account', 'Housing', 'Purpose', 'Age', 'Credit amount', 'Duration']
-            for col in required_cols:
-                if col not in dataframe.columns:
-                    raise CustomException(f"Missing required column: {col}", sys)
+            # Splitting features and target
+            logger.info("Splitting features and target variable.")
+            X = dataframe.drop(columns=["Risk"])
+            y = np.where(dataframe["Risk"] == "good", 1, 0)
 
-            # Handle missing values for categorical columns with the mode (most frequent value)
-            dataframe['Saving accounts'].fillna(dataframe['Saving accounts'].mode()[0], inplace=True)
-            dataframe['Checking account'].fillna(dataframe['Checking account'].mode()[0], inplace=True)
-            dataframe['Sex'].fillna(dataframe['Sex'].mode()[0], inplace=True)  # Handle missing values in 'Sex'
+            # Splitting the dataset into train-test
+            logger.info("Splitting the dataset into train and test sets.")
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-            # Label encoding for categorical columns
-            label_encoding_cols = ['Sex', 'Housing', 'Saving accounts', 'Checking account', 'Purpose']
-            label_encoder = LabelEncoder()
-            for col in label_encoding_cols:
-                dataframe[col] = label_encoder.fit_transform(dataframe[col])
-
-            # Separate features and target
-            X = dataframe.drop(columns=TARGET_COLUMN)
-            y = dataframe[TARGET_COLUMN].map({"good": 1, "bad": 0})  # Map target to 1 and 0
-
-            # Apply SMOTE to address class imbalance
-            smote = SMOTE(random_state=42)
-            X_resampled, y_resampled = smote.fit_resample(X, y)
-
-            # Split data into training and test sets
-            X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
-
-            # Define numeric columns for scaling
-            numeric_cols = ['Age', 'Credit amount', 'Duration']
-
-            # Get the preprocessing pipeline
-            preprocessor = self.get_data_transformer_object(numeric_cols=numeric_cols)
-
-            # Apply preprocessing to the training and test sets
+            # Apply preprocessing
+            logger.info("Applying preprocessing steps to training and testing data.")
+            preprocessor = self.get_data_transformer_object()
             X_train_scaled = preprocessor.fit_transform(X_train)
             X_test_scaled = preprocessor.transform(X_test)
 
-            # Save the preprocessor pipeline object for later use
-            preprocessor_path = self.data_transformation_config.transformed_object_file_path
-            os.makedirs(os.path.dirname(preprocessor_path), exist_ok=True)
-            self.utils.save_object(file_path=preprocessor_path, obj=preprocessor)
+            # Apply SMOTE to handle class imbalance
+            logger.info("Applying SMOTE for handling class imbalance.")
+            smote = SMOTE(random_state=42)
+            X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
-            # Combine scaled data with the target values
-            train_arr = np.c_[X_train_scaled, y_train]
+            logger.info("SMOTE applied. Resampled class distribution in training set: %s", np.bincount(y_train_resampled))
+
+            # Combine processed data with target variable
+            logger.info("Combining processed data with target variable.")
+            train_arr = np.c_[X_train_resampled, y_train_resampled]
             test_arr = np.c_[X_test_scaled, y_test]
 
-            logging.info("Data transformation completed successfully.")
-            return train_arr, test_arr, preprocessor_path
+            # Save preprocessor
+            logger.info("Saving preprocessor object to file.")
+            preprocessor_path = self.data_transformation_config.transformed_object_file_path
+            os.makedirs(os.path.dirname(preprocessor_path), exist_ok=True)
+            with open(preprocessor_path, 'wb') as f:
+                pickle.dump(preprocessor, f)
 
+            logger.info("Data transformation completed successfully.")
+            # Return processed arrays and preprocessor path
+            return (train_arr, test_arr, preprocessor_path)
         except Exception as e:
-            raise CustomException(f"Error during data transformation: {e}", sys)
+            logger.error("Error during data transformation: %s", e)
+            raise
