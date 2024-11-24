@@ -172,7 +172,7 @@ class ModelTrainer:
             if best_model_score < 0.5:
                 raise Exception("No best model found with an accuracy greater than the threshold 0.5")
 
-            logging.info(f"Best found model on both training and testing dataset")
+            logging.info(f"Best found model on both training and testing dataset {best_model_name} and score: {best_model_score}")
 
             # Saving the model
             logging.info(f"Saving model at path: {self.model_trainer_config.trained_model_path}")
