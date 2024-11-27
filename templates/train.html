@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Training</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_train.css') }}">
+</head>
+<body>
+    <div class="training-container">
+        <header>
+            <h1>Training Your Model...</h1>
+            <p>Your machine learning model is being trained. Please wait while we process your data and optimize the model.</p>
+        </header>
+        <main>
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p class="progress-text" id="progress-text">Initializing...</p>
+            </div>
+            <div class="status-message">
+                <p id="status-message">Setting up the environment...</p>
+            </div>
+        </main>
+        <footer>
+            <p>Powered by Machine Learning App &copy; 2024</p>
+        </footer>
+    </div>
+    <script src="{{ url_for('static', filename='scripts_train.js') }}"></script>
+</body>
+</html>

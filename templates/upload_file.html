@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload CSV for Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 class="header-title">Upload CSV for Prediction</h1>
+            <p class="header-subtitle">Securely upload your data for analysis</p>
+        </header>
+    
+        <form action="/predict" method="POST" enctype="multipart/form-data">
+            <div class="credit-card">
+                <div class="card-header">
+                    <div class="bank-name">Premium Bank</div>
+                    <div class="chip-icon"></div>
+                </div>
+                <div class="card-body">
+                    <div class="card-number">**** **** **** 1234</div>
+                    <div class="upload-instruction">Drag and drop your CSV file here</div>
+                </div>
+                <label for="file-upload" class="dropzone">
+                    <div class="upload-area">
+                        <input type="file" id="file-upload" name="file" accept=".csv" required>
+                        <p>Choose File</p>
+                    </div>
+                </label>
+                <button type="submit" class="btn">Upload File</button>
+            </div>
+        </form>
+    </div>
+    
+    
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
