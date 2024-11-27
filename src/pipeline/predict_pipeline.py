@@ -11,6 +11,7 @@ from src.utils.main_utils import MainUtils
 from dataclasses import dataclass
 from datetime import datetime
 from flask import request 
+import logging
 
 # Load environment variables
 load_dotenv()
@@ -42,8 +43,9 @@ class PredictionPipeline:
 
     def predict(self, features: pd.DataFrame):
         try:
+            logging.info("Starting data  process data by preprocessor in predict file.")
             # Apply the same preprocessing pipeline to the input features
-            transformed_x = self.preprocessor.transform(features)
+            transformed_x = self.preprocessor.fit_transform(features)
 
             # Make predictions
             preds = self.model.predict(transformed_x)
