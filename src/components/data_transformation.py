@@ -4,22 +4,24 @@ import pandas as pd
 import numpy as np
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import RobustScaler, LabelEncoder
-from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
 from dataclasses import dataclass
 import pickle
 import logging
 
+import category_encoders as ce  # For Binary Encoding
+from sklearn.pipeline import Pipeline
+from src.exception import CustomException
+from sklearn.base import BaseEstimator, TransformerMixin
+
 # Set up logging
 log_file = "data_transformation.log"
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),  # Print logs to console
-        logging.FileHandler(log_file)  # Write logs to file
-    ]
+    handlers=[logging.StreamHandler(), logging.FileHandler(log_file)]
 )
 logger = logging.getLogger()
 
@@ -30,6 +32,40 @@ class DataTransformationConfig:
         self.transformed_train_file_path = os.path.join(self.artifact_dir, 'train.npy')
         self.transformed_test_file_path = os.path.join(self.artifact_dir, 'test.npy')
         self.transformed_object_file_path = os.path.join(self.artifact_dir, 'preprocessor.pkl')
+
+
+class LabelEncoderTransformer(BaseEstimator, TransformerMixin):
+    """Custom transformer for label encoding multiple columns"""
+    def __init__(self, columns):
+        self.columns = columns
+        self.label_encoders = {col: LabelEncoder() for col in columns}
+
+    def fit(self, X, y=None):
+        for col in self.columns:
+            self.label_encoders[col].fit(X[col])
+        return self
+
+    def transform(self, X):
+        X_copy = X.copy()
+        for col in self.columns:
+            X_copy[col] = self.label_encoders[col].transform(X_copy[col])
+        return X_copy
+
+
+class BinaryEncoder(BaseEstimator, TransformerMixin):
+    def __init__(self, columns):
+        self.columns = columns
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        X_copy = X.copy()
+        for col in X_copy.columns:
+            if col in self.columns:
+                X_copy[col] = X_copy[col].apply(lambda x: 1 if x == 'good' or x == 'male' else 0)
+        return X_copy
+
 
 
 class DataTransformation:
@@ -47,95 +83,87 @@ class DataTransformation:
         """Reads and preprocesses the data."""
         try:
             logger.info("Loading dataset from: %s", self.feature_store_file_path)
-            # Load dataset
             df = pd.read_csv(self.feature_store_file_path)
 
             logger.info("Dropping unnecessary columns (if any).")
-            # Drop unnecessary columns
             if "Unnamed: 0" in df.columns:
                 df.drop(["Unnamed: 0"], axis=1, inplace=True)
 
-            # Handle missing values if needed (before encoding)
             logger.info("Handling missing values.")
             df.fillna(method='ffill', inplace=True)  # Forward fill as an example
 
-            # Encode specific categorical variables
-            logger.info("Encoding categorical variables.")
-            saving_accounts_mapping = {'little': 0, 'moderate': 1, 'rich': 2, 'quite rich': 3}
-            checking_account_mapping = {'little': 0, 'moderate': 1, 'rich': 2}
-            df['Saving accounts'] = df['Saving accounts'].map(saving_accounts_mapping)
-            df['Checking account'] = df['Checking account'].map(checking_account_mapping)
-
-            # Columns to apply Label Encoding
-            label_encoding_cols = ['Sex','Job', 'Housing', 'Saving accounts', 'Checking account', 'Purpose']
-            # Initialize Label Encoder
-            label_encoder = LabelEncoder()
-
-            # Apply Label Encoding to each column
-            for col in label_encoding_cols:
-                if df[col].isnull().sum() > 0:
-                    logger.warning("Column %s contains missing values. These will be handled before encoding.", col)
-                    df[col].fillna(df[col].mode()[0], inplace=True)  # Fill missing values with mode
-
-                logger.info(f"Encoding column {col}.")
-                df[col] = label_encoder.fit_transform(df[col])
+            label_encoding_cols = ['Sex', 'Job', 'Housing', 'Saving accounts', 'Checking account', 'Purpose']
+            label_encoder = LabelEncoderTransformer(columns=label_encoding_cols)
+            df = label_encoder.fit_transform(df)
 
             logger.info("Returning preprocessed dataframe.")
             return df
         except Exception as e:
             logger.error("Error during data loading: %s", e)
-            raise
+            raise CustomException(e, sys)
 
     def get_data_transformer_object(self):
-        """Creates and returns a data transformer pipeline."""
+        """Creates and returns a data transformer pipeline with imputation, scaling, and encoding."""
         try:
             logger.info("Creating data transformation pipeline.")
-            # Define a pipeline with imputation and scaling
-            pipeline = Pipeline([ 
-                ('imputer', KNNImputer(n_neighbors=5)),
+            
+
+            # Column names for label encoding
+            label_encode_columns = ['Housing', 'Saving accounts', 'Checking account', 'Purpose']
+
+            # Define the pipeline steps
+            
+
+            pipeline_steps = [
+                ('label_encoder', LabelEncoderTransformer(columns=label_encode_columns)),
+                ('binary_encoder', BinaryEncoder(columns=['Sex', 'Risk'])),
+                ('imputer', SimpleImputer(strategy='mean')),  # Use SimpleImputer
                 ('scaler', RobustScaler())
-            ])
+            ]
+
+
+
+            pipeline = Pipeline(pipeline_steps)
             return pipeline
         except Exception as e:
             logger.error("Error during pipeline creation: %s", e)
-            raise
+            raise CustomException(e, sys)
 
     def initiate_data_transformation(self):
         """Main function for data transformation."""
         try:
             logger.info("Starting data transformation process.")
-            
-            # Load and preprocess data
             dataframe = self.get_data()
 
-            # Splitting features and target
             logger.info("Splitting features and target variable.")
             X = dataframe.drop(columns=["Risk"])
             y = np.where(dataframe["Risk"] == "good", 1, 0)
 
-            # Splitting the dataset into train-test
             logger.info("Splitting the dataset into train and test sets.")
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-            # Apply preprocessing
-            logger.info("Applying preprocessing steps to training and testing data.")
+            logger.info("Applying preprocessing pipeline to training data.")
             preprocessor = self.get_data_transformer_object()
-            X_train_scaled = preprocessor.fit_transform(X_train)
-            X_test_scaled = preprocessor.transform(X_test)
+            X_train_processed = preprocessor.fit_transform(X_train)
+            
+            # # Apply the pipeline to the training data
+            # X_train_processed = preprocessor.fit_transform(X_train)
 
-            # Apply SMOTE to handle class imbalance
-            logger.info("Applying SMOTE for handling class imbalance.")
+            # # Convert the transformed array back to a DataFrame with original column names
+            # X_train_processed_df = pd.DataFrame(X_train_processed, columns=X_train.columns)
+
+
+            logger.info("Applying SMOTE to handle class imbalance.")
             smote = SMOTE(random_state=42)
-            X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
+            X_train_smote, y_train_smote = smote.fit_resample(X_train_processed, y_train)
 
-            logger.info("SMOTE applied. Resampled class distribution in training set: %s", np.bincount(y_train_resampled))
+            logger.info("Applying preprocessing pipeline to testing data.")
+            X_test_processed = preprocessor.transform(X_test)
 
-            # Combine processed data with target variable
             logger.info("Combining processed data with target variable.")
-            train_arr = np.c_[X_train_resampled, y_train_resampled]
-            test_arr = np.c_[X_test_scaled, y_test]
+            train_arr = np.c_[X_train_smote, y_train_smote]
+            test_arr = np.c_[X_test_processed, y_test]
 
-            # Save preprocessor
             logger.info("Saving preprocessor object to file.")
             preprocessor_path = self.data_transformation_config.transformed_object_file_path
             os.makedirs(os.path.dirname(preprocessor_path), exist_ok=True)
@@ -143,8 +171,7 @@ class DataTransformation:
                 pickle.dump(preprocessor, f)
 
             logger.info("Data transformation completed successfully.")
-            # Return processed arrays and preprocessor path
             return (train_arr, test_arr, preprocessor_path)
         except Exception as e:
             logger.error("Error during data transformation: %s", e)
-            raise
+            raise CustomException(e, sys)
