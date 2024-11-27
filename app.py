@@ -23,7 +23,7 @@ def train_route():
         # Pass the artifact folder path to TrainingPipeline
         train_pipeline = TrainingPipeline(artifact_folder=artifact_folder)
         train_pipeline.run_pipeline()
-        return "Training Completed."
+        return render_template('train.html')
     except Exception as e:
         raise CustomException(e, sys)
 
