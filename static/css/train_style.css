@@ -1,0 +1,81 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom right, #1e3c72, #2a5298);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container */
+.training-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* Credit Card Style */
+.card {
+    background: #232526;
+    border-radius: 15px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    width: 350px;
+    text-align: center;
+    animation: fadeIn 2s ease-in-out;
+}
+
+.card-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #ffcc00;
+}
+
+.card-content {
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.card-content p {
+    line-height: 1.5;
+}
+
+/* Progress Bar */
+.progress-bar {
+    background: #ddd;
+    border-radius: 10px;
+    height: 15px;
+    width: 100%;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+.progress {
+    background: linear-gradient(to right, #ff9800, #ff5722);
+    height: 100%;
+    width: 0;
+    transition: width 1s ease;
+}
+
+/* Footer */
+.card-footer {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

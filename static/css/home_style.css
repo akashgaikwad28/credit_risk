@@ -1,0 +1,121 @@
+/* General reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif; /* Modern font */
+}
+
+/* Background styling */
+.background {
+    background: url('../images/bank-background.jpg'); /* Adjust path for actual deployment */
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    position: relative;
+}
+
+/* Gradient overlay for background */
+.background::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Semi-transparent black overlay */
+    z-index: -1; /* Behind the content */
+}
+
+/* Credit card container */
+.credit-card {
+    background: rgba(255, 255, 255, 0.85); /* Slight transparency for the card */
+    border-radius: 16px;
+    padding: 30px 40px;
+    width: 380px;
+    max-width: 90%; /* Ensure card is responsive */
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3); /* Enhanced shadow for depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+/* Hover effect on card */
+.credit-card:hover {
+    transform: translateY(-10px); /* Lift the card when hovered */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Headings */
+.credit-card h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Button container */
+.buttons {
+    margin-top: 30px;
+}
+
+/* Common button styles */
+.button {
+    display: inline-block;
+    margin: 12px 6px;
+    padding: 14px 24px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 50px; /* Rounded buttons */
+    font-size: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    border: none; /* Remove default border */
+    text-transform: uppercase;
+}
+
+/* Button colors */
+.button.train {
+    background-color: #28a745; /* Green */
+}
+
+.button.predict {
+    background-color: #007bff; /* Blue */
+}
+
+/* Button hover and focus effects */
+.button:hover,
+.button:focus {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    outline: none;
+    background-color: #0056b3; /* Darker blue on hover for predict */
+}
+
+.button.train:hover {
+    background-color: #218838; /* Darker green on hover for train */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .credit-card {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .button {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    .credit-card h2 {
+        font-size: 1.6rem;
+    }
+}
