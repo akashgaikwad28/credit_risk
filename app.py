@@ -1,10 +1,9 @@
-from flask import Flask, render_template, jsonify, request, send_file
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from src.exception import CustomException
 from src.logger import logging as lg
-import os
-import sys
 from src.pipeline.train_pipeline import TrainingPipeline
 from src.pipeline.predict_pipeline import PredictionPipeline
+import os
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -14,55 +13,48 @@ artifact_folder = os.path.join(os.getcwd(), "artifacts")
 
 @app.route("/")
 def home():
-    return "Welcome to my application"
+    # Render the home page with background image and buttons
+    return render_template("home.html")
 
-# Training route
-@app.route("/train")
+@app.route("/train", methods=["POST"])
 def train_route():
     try:
-        # Pass the artifact folder path to TrainingPipeline
-        train_pipeline = TrainingPipeline(artifact_folder=artifact_folder)
-        train_pipeline.run_pipeline()
-        return render_template('train.html')
-    except Exception as e:
-        raise CustomException(e, sys)
+        
+        
+        # Trigger the training pipeline
+        training_pipeline = TrainingPipeline(artifact_folder=artifact_folder)
+        training_pipeline.run_pipeline()
+        lg.info("Model training completed successfully.")
+        return render_template("train_complete.html")
+    except CustomException as e:
+        lg.error(f"Error during training: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-# Prediction route (handles both GET and POST)
-@app.route('/predict', methods=['POST', 'GET'])
-def upload():
-    try:
-        if request.method == 'POST':
-            # Check if the file is part of the request
-            if 'file' not in request.files:
-                return "No file part in the request.", 400
-            
-            uploaded_file = request.files['file']
+@app.route("/predict", methods=["GET", "POST"])
+def predict_route():
+    if request.method == "POST":
+        # Handle file upload and trigger prediction pipeline
+        if 'file' not in request.files:
+            return jsonify({"error": "No file part"}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+        
+        try:
+            # Save uploaded file
+            file_path = os.path.join(artifact_folder, file.filename)
+            file.save(file_path)
 
-            # Ensure the file is present and has a valid name
-            if uploaded_file.filename == '':
-                return "No selected file.", 400
+            # Run prediction
+            prediction_pipeline = PredictionPipeline()
+            prediction_result = prediction_pipeline.run_pipeline(file_path)
+            lg.info("Prediction completed successfully.")
+            return jsonify({"prediction": prediction_result})
 
-            # Check if the file has a valid CSV extension and MIME type
-            if uploaded_file.filename.endswith('.csv') or uploaded_file.content_type == 'text/csv':
-                # Process the file using PredictionPipeline
-                prediction_pipeline = PredictionPipeline(request)
-                prediction_file_detail = prediction_pipeline.run_pipeline()
-
-                lg.info(f"Prediction completed for file: {uploaded_file.filename}.")
-                return send_file(prediction_file_detail.prediction_file_path,
-                                 download_name=prediction_file_detail.prediction_file_name,
-                                 as_attachment=True)
-            else:
-                return "Please upload a valid CSV file.", 400
-        else:
-            # Render the file upload HTML page
-            return render_template('upload_file.html')
-    
-    except Exception as e:
-        # Log the error
-        lg.error(f"Error during prediction: {e}")
-        raise CustomException(e, sys)
-
+        except CustomException as e:
+            lg.error(f"Error during prediction: {str(e)}")
+            return jsonify({"error": str(e)}), 500
+    return render_template("upload_file.html")
 
 # Run the Flask application
 if __name__ == "__main__":
