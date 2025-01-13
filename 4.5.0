@@ -1,0 +1,38 @@
+Collecting numpy
+  Using cached numpy-2.2.1-cp311-cp311-win_amd64.whl.metadata (60 kB)
+Collecting overrides
+  Using cached overrides-7.7.0-py3-none-any.whl.metadata (5.8 kB)
+Collecting pydantic
+  Using cached pydantic-2.10.4-py3-none-any.whl.metadata (29 kB)
+Collecting PyYAML
+  Using cached PyYAML-6.0.2-cp311-cp311-win_amd64.whl.metadata (2.1 kB)
+Collecting requests
+  Using cached requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
+Collecting tqdm
+  Using cached tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+Collecting typing-extensions
+  Using cached typing_extensions-4.12.2-py3-none-any.whl.metadata (3.0 kB)
+Requirement already satisfied: annotated-types>=0.6.0 in c:\users\akash\appdata\roaming\python\python311\site-packages (from pydantic) (0.6.0)
+Collecting pydantic-core==2.27.2 (from pydantic)
+  Using cached pydantic_core-2.27.2-cp311-cp311-win_amd64.whl.metadata (6.7 kB)
+Collecting charset-normalizer<4,>=2 (from requests)
+  Using cached charset_normalizer-3.4.1-cp311-cp311-win_amd64.whl.metadata (36 kB)
+Collecting idna<4,>=2.5 (from requests)
+  Using cached idna-3.10-py3-none-any.whl.metadata (10 kB)
+Requirement already satisfied: urllib3<3,>=1.21.1 in c:\users\akash\appdata\roaming\python\python311\site-packages (from requests) (2.2.2)
+Collecting certifi>=2017.4.17 (from requests)
+  Using cached certifi-2024.12.14-py3-none-any.whl.metadata (2.3 kB)
+Requirement already satisfied: colorama in c:\users\akash\credit_risk\credit\lib\site-packages (from tqdm) (0.4.6)
+Using cached numpy-2.2.1-cp311-cp311-win_amd64.whl (12.9 MB)
+Using cached overrides-7.7.0-py3-none-any.whl (17 kB)
+Using cached pydantic-2.10.4-py3-none-any.whl (431 kB)
+Using cached pydantic_core-2.27.2-cp311-cp311-win_amd64.whl (2.0 MB)
+Using cached PyYAML-6.0.2-cp311-cp311-win_amd64.whl (161 kB)
+Using cached requests-2.32.3-py3-none-any.whl (64 kB)
+Using cached tqdm-4.67.1-py3-none-any.whl (78 kB)
+Using cached typing_extensions-4.12.2-py3-none-any.whl (37 kB)
+Using cached certifi-2024.12.14-py3-none-any.whl (164 kB)
+Using cached charset_normalizer-3.4.1-cp311-cp311-win_amd64.whl (102 kB)
+Using cached idna-3.10-py3-none-any.whl (70 kB)
+Installing collected packages: typing-extensions, tqdm, PyYAML, overrides, numpy, idna, charset-normalizer, certifi, requests, pydantic-core, pydantic
+Successfully installed PyYAML-6.0.2 certifi-2024.12.14 charset-normalizer-3.4.1 idna-3.10 numpy-2.2.1 overrides-7.7.0 pydantic-2.10.4 pydantic-core-2.27.2 requests-2.32.3 tqdm-4.67.1 typing-extensions-4.12.2
