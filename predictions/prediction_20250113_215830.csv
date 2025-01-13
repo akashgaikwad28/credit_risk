@@ -100,7 +100,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 36,male,2,own,little,moderate,2337,36,radio/TV,good
 36,male,3,rent,,moderate,7057,20,car,good
 41,male,1,rent,moderate,,1469,24,car,bad
-24,male,2,rent,little,moderate,2323,36,radio/TV,good
+24,male,2,rent,little,moderate,2323,36,radio/TV,bad
 24,female,2,own,little,,932,6,radio/TV,good
 35,male,2,rent,little,moderate,1919,9,furniture/equipment,good
 26,male,2,rent,,,2445,12,car,good
@@ -217,10 +217,10 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 39,female,1,own,,moderate,932,6,education,good
 31,male,2,own,little,little,3104,18,business,good
 23,male,2,own,little,rich,3913,36,radio/TV,bad
-24,male,1,rent,little,little,3021,24,furniture/equipment,bad
+24,male,1,rent,little,little,3021,24,furniture/equipment,good
 64,female,2,own,little,,1364,10,car,good
 26,male,1,own,little,moderate,625,12,radio/TV,good
-23,female,2,rent,,little,1200,12,education,bad
+23,female,2,rent,,little,1200,12,education,good
 30,male,2,own,little,,707,12,radio/TV,good
 32,male,2,own,,,2978,24,business,good
 30,male,2,own,little,,4657,15,car,good
@@ -322,7 +322,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 28,male,3,own,little,moderate,4249,30,car,bad
 32,male,2,own,little,little,1938,24,radio/TV,good
 34,male,3,free,little,little,2910,24,car,good
-28,male,2,own,rich,little,2659,18,furniture/equipment,bad
+28,male,2,own,rich,little,2659,18,furniture/equipment,good
 36,female,2,own,little,,1028,18,car,bad
 39,male,1,own,little,little,3398,8,car,good
 49,male,2,rent,,,5801,12,furniture/equipment,good
@@ -352,7 +352,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 23,female,2,rent,little,,1236,9,domestic appliances,good
 29,female,2,own,little,moderate,959,9,furniture/equipment,bad
 38,male,3,own,,,3229,18,car,good
-28,male,2,rent,little,little,6199,12,radio/TV,bad
+28,male,2,rent,little,little,6199,12,radio/TV,good
 46,male,2,free,quite rich,,727,10,education,good
 23,male,1,own,little,moderate,1246,24,car,bad
 49,male,2,own,,,2331,12,radio/TV,good
@@ -416,7 +416,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 35,female,2,own,,little,1381,24,car,good
 35,male,2,own,little,,5842,36,car,good
 33,male,1,own,little,little,2579,12,car,bad
-23,female,2,rent,,little,8471,18,education,bad
+23,female,2,rent,,little,8471,18,education,good
 31,female,3,own,quite rich,,2782,21,car,good
 33,female,2,own,,moderate,1042,18,car,bad
 20,female,2,rent,rich,,3186,15,car,good
@@ -445,7 +445,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 41,male,1,own,little,,719,12,education,bad
 30,female,3,own,little,moderate,5096,48,furniture/equipment,bad
 41,female,1,rent,,,1244,9,education,good
-34,female,2,own,little,little,1842,36,car,good
+34,female,2,own,little,little,1842,36,car,bad
 35,male,2,own,little,moderate,2576,7,radio/TV,good
 55,female,3,own,,rich,1424,12,furniture/equipment,good
 61,male,2,own,rich,moderate,1512,15,repairs,good
@@ -477,7 +477,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 26,female,2,rent,little,little,3114,18,furniture/equipment,bad
 24,male,2,own,quite rich,,2569,39,car,good
 25,male,2,own,little,rich,5152,24,radio/TV,good
-39,male,1,own,moderate,moderate,1037,12,business,good
+39,male,1,own,moderate,moderate,1037,12,business,bad
 44,male,2,own,little,little,1478,15,furniture/equipment,good
 23,female,1,own,little,moderate,3573,12,radio/TV,good
 26,male,2,own,little,moderate,1201,24,car,good
@@ -554,7 +554,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 34,male,2,own,little,little,6999,48,radio/TV,bad
 27,male,2,own,moderate,moderate,1995,12,car,good
 67,female,3,own,little,moderate,1199,9,education,good
-22,male,2,own,little,moderate,1331,12,radio/TV,bad
+22,male,2,own,little,moderate,1331,12,radio/TV,good
 28,female,2,own,moderate,moderate,2278,18,car,bad
 29,female,2,own,,,5003,21,car,good
 27,male,2,own,little,little,3552,24,furniture/equipment,bad
@@ -627,7 +627,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 35,male,2,own,,,1979,15,radio/TV,good
 41,male,2,own,little,rich,2116,6,furniture/equipment,good
 29,male,2,own,moderate,moderate,1437,9,car,good
-36,male,2,own,quite rich,,4042,42,furniture/equipment,bad
+36,male,2,own,quite rich,,4042,42,furniture/equipment,good
 64,male,1,own,,,3832,9,education,good
 28,female,2,own,little,little,3660,24,radio/TV,good
 44,male,2,own,little,little,1553,18,furniture/equipment,bad
@@ -644,7 +644,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 40,male,3,own,moderate,,4623,15,education,bad
 33,male,2,own,little,,1851,24,radio/TV,good
 32,male,3,own,little,little,1880,18,radio/TV,good
-27,male,2,rent,,,7980,36,business,good
+27,male,2,rent,,,7980,36,business,bad
 32,male,2,own,little,little,4583,30,furniture/equipment,good
 26,female,2,own,quite rich,,1386,12,car,good
 38,male,2,free,little,rich,947,24,car,bad
@@ -728,7 +728,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 47,male,1,own,quite rich,,1316,15,radio/TV,good
 25,female,2,rent,little,little,1882,18,radio/TV,good
 59,female,2,rent,little,moderate,6416,48,business,bad
-36,male,2,own,rich,rich,1275,24,business,bad
+36,male,2,own,rich,rich,1275,24,business,good
 33,male,2,own,little,moderate,6403,24,radio/TV,good
 21,male,1,rent,little,little,1987,24,radio/TV,bad
 44,female,1,own,little,moderate,760,8,radio/TV,good
@@ -738,7 +738,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 23,female,3,rent,little,moderate,11560,24,car,bad
 35,male,1,own,moderate,little,4380,18,car,good
 45,male,3,own,little,,6761,6,car,good
-26,female,1,rent,moderate,moderate,4280,30,business,bad
+26,female,1,rent,moderate,moderate,4280,30,business,good
 32,male,2,own,moderate,little,2325,24,car,good
 23,male,1,own,little,moderate,1048,10,radio/TV,good
 41,male,2,own,,,3160,21,radio/TV,good
@@ -817,7 +817,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 54,female,2,rent,little,moderate,7432,36,car,good
 62,male,2,own,quite rich,,1338,6,domestic appliances,good
 24,female,2,rent,little,,1554,6,radio/TV,good
-43,male,3,own,little,little,15857,36,vacation/others,bad
+43,male,3,own,little,little,15857,36,vacation/others,good
 26,male,2,own,little,little,1345,18,radio/TV,good
 27,male,2,own,little,,1101,12,car,good
 24,male,2,own,little,rich,3016,12,radio/TV,good
@@ -848,12 +848,12 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 68,male,2,rent,,,6761,18,car,good
 28,male,2,own,little,,1249,24,car,bad
 59,male,2,own,little,little,1364,9,radio/TV,good
-57,male,1,own,little,little,709,12,radio/TV,bad
+57,male,1,own,little,little,709,12,radio/TV,good
 33,male,2,rent,little,little,2235,20,car,bad
 43,male,2,own,,,4042,24,car,good
 35,male,2,free,little,,1471,15,radio/TV,good
 32,male,1,free,little,little,1442,18,car,bad
-45,male,2,own,little,,10875,36,car,bad
+45,male,2,own,little,,10875,36,car,good
 33,male,2,own,moderate,,1474,24,car,good
 40,female,2,own,,,894,10,education,good
 28,male,2,free,little,,3343,15,furniture/equipment,good
@@ -906,7 +906,7 @@ Age,Sex,Job,Housing,Saving accounts,Checking account,Credit amount,Duration,Purp
 36,male,3,own,little,,1278,24,radio/TV,good
 20,male,3,rent,little,little,1107,12,radio/TV,good
 24,male,1,own,,little,3763,21,car,good
-27,male,2,own,,moderate,3711,36,education,good
+27,male,2,own,,moderate,3711,36,education,bad
 46,female,1,own,little,,3594,15,car,good
 33,female,1,own,,moderate,3195,9,car,good
 34,female,2,own,little,,4454,36,radio/TV,good
